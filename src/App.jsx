@@ -91,8 +91,10 @@ export default function App() {
     try {
       const promises = files.map(async (file, index) => {
         const result = await processImageToWebP(file, index);
-        const safeName = result.originalName.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const fileName = `${safeName}_sticker_${result.index + 1}.webp`;
+        // const safeName = result.originalName.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        // const fileName = `${safeName}_sticker_${result.index + 1}.webp`;
+        const hash = crypto.randomUUID().replace(/-/g, '');
+        const fileName = `sticker_${hash}.webp`;
         
         folder.file(fileName, result.blob);
         
