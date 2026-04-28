@@ -28,10 +28,10 @@ A modern, privacy-focused web application that converts your images into WhatsAp
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/indiser/Sticker-Studio.git
 
 # Navigate to project directory
-cd sticker-drop
+cd Sticker-Studio
 
 # Install dependencies
 npm install
