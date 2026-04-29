@@ -46,6 +46,27 @@ export default function App() {
     }
   });
 
+  const drawHighQuality = (ctx, img, dx, dy, dw, dh) => {
+  // Step down in halves for images much larger than target
+      let current = document.createElement('canvas');
+      current.width = img.width;
+      current.height = img.height;
+      current.getContext('2d').drawImage(img, 0, 0);
+
+      while (current.width / 2 > dw && current.height / 2 > dh) {
+            const next = document.createElement('canvas');
+            next.width = Math.max(Math.floor(current.width / 2), dw);
+            next.height = Math.max(Math.floor(current.height / 2), dh);
+            const nCtx = next.getContext('2d');
+            nCtx.imageSmoothingEnabled = true;
+            nCtx.imageSmoothingQuality = 'high';
+            nCtx.drawImage(current, 0, 0, next.width, next.height);
+            current = next;
+      }
+
+      ctx.drawImage(current, dx, dy, dw, dh);
+    };
+
   const processImageToWebP = (file, index) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -57,20 +78,28 @@ export default function App() {
           canvas.height = 512;
           const ctx = canvas.getContext('2d');
 
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+
+          // ctx.fillStyle = '#FFFFFF';
+          // ctx.fillRect(0, 0, 512, 512);
+
           ctx.clearRect(0, 0, 512, 512);
 
-          const scale = Math.min(512 / img.width, 512 / img.height);
+          // const scale = Math.min(512 / img.width, 512 / img.height);
+          const scale = Math.min(1, Math.min(512 / img.width, 512 / img.height));
           const newWidth = img.width * scale;
           const newHeight = img.height * scale;
           const offsetX = (512 - newWidth) / 2;
           const offsetY = (512 - newHeight) / 2;
 
-          ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+          // ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+          drawHighQuality(ctx, img, offsetX, offsetY, newWidth, newHeight);
 
           canvas.toBlob((blob) => {
             if (blob) resolve({ blob, originalName: file.name, index });
             else reject(new Error("Conversion failed"));
-          }, 'image/webp', 0.8);
+          }, 'image/webp', 0.85);
         };
         img.src = event.target.result;
       };
